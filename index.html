@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Учет работ</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f4f4f9;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 400px;
+            margin: 0 auto; /* По центру */
+        }
+        h2 { text-align: center; color: #333; }
+        label { display: block; margin-top: 15px; color: #555; }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box; /* Чтобы отступы не ломали ширину */
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #28a745; /* Зеленый цвет */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        button:hover { background-color: #218838; }
+        .status { margin-top: 15px; text-align: center; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Отчет о работе</h2>
+    
+    <label>Дата работ:</label>
+    <input type="date" id="dateWork">
+
+    <label>Место объекта:</label>
+    <input type="text" id="place" placeholder="Например: ул. Ленина 5">
+
+    <label>Описание работ:</label>
+    <textarea id="description" rows="3" placeholder="Что было сделано?"></textarea>
+
+    <label>Количество (м²):</label>
+    <input type="number" id="amount" placeholder="0">
+
+    <button onclick="sendData()" id="sendBtn">Отправить отчет</button>
+    <div id="statusMsg" class="status"></div>
+</div>
+
+<script>
+    // СЮДА ВСТАВЬ СВОЮ ДЛИННУЮ ССЫЛКУ ИЗ GOOGLE APPS SCRIPT
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbypBZugdjY9fXYuyqnbsUTO-06GO4KFU_tkw4mgDmCV5ba4Y8ulltQgN_bCBhxXNM9W/exec";
+
+    function sendData() {
+        // Собираем данные из полей
+        const data = {
+            dateWork: document.getElementById('dateWork').value,
+            place: document.getElementById('place').value,
+            description: document.getElementById('description').value,
+            amount: document.getElementById('amount').value
+        };
+
+        // Простая проверка, заполнены ли поля
+        if(!data.dateWork || !data.amount) {
+            alert("Пожалуйста, заполните дату и метраж!");
+            return;
+        }
+
+        const btn = document.getElementById('sendBtn');
+        const msg = document.getElementById('statusMsg');
+        
+        btn.disabled = true;
+        btn.innerText = "Отправка...";
+        msg.innerText = "";
+
+        // Отправляем данные в Google
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors", // Важно для Google Scripts
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        }).then(() => {
+            msg.innerText = "Успешно отправлено!";
+            msg.style.color = "green";
+            // Очищаем поля
+            document.getElementById('place').value = "";
+            document.getElementById('description').value = "";
+            document.getElementById('amount').value = "";
+            btn.disabled = false;
+            btn.innerText = "Отправить отчет";
+        }).catch(err => {
+            msg.innerText = "Ошибка отправки.";
+            msg.style.color = "red";
+            btn.disabled = false;
+            btn.innerText = "Попробовать снова";
+        });
+    }
+</script>
+
+</body>
+</html>
